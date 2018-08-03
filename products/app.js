@@ -24,22 +24,36 @@ app.get('/', (req,res) => {
 // REST - Representational State Transfer Protocol
 // TO PERFORM AN OPERATION ON A RESOURCE / DATA YOU WILL NEED TO GO TO A END POINT WIHT A SPECIFIC HTTP METHOD
 
+let categories = [
+    {
+        id: 1,
+        name: 'Sports'
+    },
+    {
+        id: 2,
+        name: 'Stationary'
+    }
+]
+
 // dummy db
 let products = [
     {
         id: 1,
         name: 'Marker',
-        price: 15
+        price: 15,
+        category_Id: 2
     },
     {
         id: 2,
         name: 'Scale',
-        price: 5
+        price: 5,
+        category_Id: 1
     },
     {
         id: 3,
         name: 'Board',
-        price: 75
+        price: 75,
+        category_Id: 1
     }
 ];
 
@@ -55,6 +69,10 @@ app.get('/products', (req,res) => {
     res.send(products);
 });
 
+app.get('/categories', (req,res) => {
+    res.send(categories);
+});
+
 // GET - /products/:id (show a specific product)
 app.get('/products/:id', (req,res) => {
     let product = products.find((product) => {
@@ -65,6 +83,20 @@ app.get('/products/:id', (req,res) => {
     } else { // if product record is not found
         res.send({
             notice: `product with id ${req.params.id} not found`
+        })
+    }
+});
+
+
+app.get('/categories/:id', (req,res) => {
+    let category =  categories.find((category) => {
+        return category.id == req.params.id;
+    });
+    if(category) {
+        res.send(category);
+    } else {
+        res.send({
+            notice: `category with id ${req.params.id} not found`
         })
     }
 });
@@ -82,7 +114,16 @@ app.post('/products', (req,res) => {
     products.push(product);
     res.send({
         product,
-        notice: 'succesfully created a product'
+        notice: 'successfully created a product'
+    });
+});
+
+app.post('/categories', (req,res) => {
+    let category = req.body;
+    categories.push(category);
+    res.send({
+        category,
+        notice: 'successfully created a category'
     });
 });
 
@@ -111,6 +152,24 @@ app.put('/products/:id', (req,res) => {
     }
 });
 
+app.put('/categories/:id', (req,res) => {
+    let category = categories.find((category) => {
+        return category.id = req.params.id;
+    });
+
+    if(category) {
+        category.name = req.body.price;
+        res.send({
+            category,
+            notice: 'Successfully updated the category'
+        });
+    } else {
+        res.send({
+            notice: `category with id ${req.params.id} is not found`
+        })
+    }
+});
+
 // DESTROY
 // DELETE - /products/:id
 app.delete('/products/:id', (req,res) => {
@@ -134,6 +193,24 @@ app.delete('/products/:id', (req,res) => {
         })
     }
 });
+
+app.delete('/categories/:id', (req,res) => {
+    let index = categories.findIndex((category) => {
+        return category.id == req.params.id;
+    });
+
+    if(index >= 0) {
+        categories.splice(index,1);
+        res.send({
+            notice: 'successfully removed the category'
+        })
+    } else {
+        res.send({
+            notice: `category with id ${req.params.id} is not found`
+        })
+    }
+});
+
 app.listen(port, () => {
     console.log('Listening on port', port);
 })
